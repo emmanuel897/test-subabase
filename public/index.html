@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Supabase Test Project</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #0f172a; color: #e2e8f0; min-height: 100vh; }
+
+    header { background: #1e293b; border-bottom: 1px solid #334155; padding: 1rem 2rem; display: flex; align-items: center; gap: 1rem; }
+    header h1 { font-size: 1.25rem; font-weight: 600; }
+    .badge { background: #3ecf8e; color: #0f172a; font-size: 0.7rem; font-weight: 700; padding: 2px 8px; border-radius: 99px; text-transform: uppercase; }
+
+    main { max-width: 1100px; margin: 2rem auto; padding: 0 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+    .card { background: #1e293b; border: 1px solid #334155; border-radius: 12px; padding: 1.5rem; }
+    .card h2 { font-size: 1rem; font-weight: 600; margin-bottom: 1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; }
+
+    .form-group { margin-bottom: 0.75rem; }
+    label { display: block; font-size: 0.8rem; color: #94a3b8; margin-bottom: 4px; }
+    input, textarea { width: 100%; background: #0f172a; border: 1px solid #334155; border-radius: 6px; padding: 8px 12px; color: #e2e8f0; font-size: 0.9rem; outline: none; transition: border-color 0.2s; }
+    input:focus, textarea:focus { border-color: #3ecf8e; }
+    textarea { height: 80px; resize: vertical; }
+
+    .btn { padding: 8px 16px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.875rem; font-weight: 500; transition: opacity 0.2s; }
+    .btn:hover { opacity: 0.85; }
+    .btn-primary { background: #3ecf8e; color: #0f172a; }
+    .btn-danger { background: #ef4444; color: white; font-size: 0.75rem; padding: 4px 10px; }
+    .btn-sm { background: #334155; color: #e2e8f0; font-size: 0.75rem; padding: 4px 10px; }
+
+    .list { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.5rem; }
+    .item { background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: flex-start; }
+    .item-info { flex: 1; }
+    .item-title { font-weight: 500; font-size: 0.9rem; }
+    .item-sub { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+    .item-actions { display: flex; gap: 6px; margin-left: 8px; }
+
+    .tag { display: inline-block; font-size: 0.7rem; padding: 2px 8px; border-radius: 99px; }
+    .tag-green { background: rgba(62,207,142,0.15); color: #3ecf8e; }
+    .tag-gray { background: #334155; color: #94a3b8; }
+
+    .status { padding: 0.75rem; border-radius: 8px; font-size: 0.85rem; margin-top: 1rem; }
+    .status-ok { background: rgba(62,207,142,0.1); color: #3ecf8e; border: 1px solid rgba(62,207,142,0.3); }
+    .status-err { background: rgba(239,68,68,0.1); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+
+    .full-width { grid-column: 1 / -1; }
+    .empty { color: #475569; font-size: 0.85rem; text-align: center; padding: 1rem; }
+
+    .tabs { display: flex; gap: 0.5rem; margin-bottom: 1rem; }
+    .tab { padding: 6px 14px; border-radius: 6px; border: 1px solid #334155; background: transparent; color: #94a3b8; cursor: pointer; font-size: 0.8rem; }
+    .tab.active { background: #3ecf8e; color: #0f172a; border-color: #3ecf8e; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Supabase Test Project</h1>
+    <span class="badge">API Live</span>
+  </header>
+
+  <main>
+    <!-- Profils -->
+    <div class="card">
+      <h2>Profils</h2>
+      <div class="form-group">
+        <label>Nom</label>
+        <input id="p-name" type="text" placeholder="Alice Dupont">
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input id="p-email" type="email" placeholder="alice@example.com">
+      </div>
+      <div class="form-group">
+        <label>Âge</label>
+        <input id="p-age" type="number" placeholder="28" min="0" max="150">
+      </div>
+      <button class="btn btn-primary" onclick="createProfile()">Créer le profil</button>
+      <div id="p-status"></div>
+      <div id="profiles-list" class="list"></div>
+    </div>
+
+    <!-- Articles -->
+    <div class="card">
+      <h2>Articles</h2>
+      <div class="form-group">
+        <label>Titre</label>
+        <input id="post-title" type="text" placeholder="Mon article Supabase">
+      </div>
+      <div class="form-group">
+        <label>Contenu</label>
+        <textarea id="post-content" placeholder="Contenu de l'article..."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Auteur (ID profil)</label>
+        <input id="post-author" type="text" placeholder="uuid du profil">
+      </div>
+      <button class="btn btn-primary" onclick="createPost()">Créer l'article</button>
+      <div id="post-status"></div>
+    </div>
+
+    <!-- Liste des articles -->
+    <div class="card full-width">
+      <div class="tabs">
+        <button class="tab active" onclick="loadPosts(false, this)">Publiés</button>
+        <button class="tab" onclick="loadPosts(true, this)">Tous</button>
+      </div>
+      <div id="posts-list" class="list"></div>
+    </div>
+  </main>
+
+  <script>
+    const API = ''
+
+    async function api(path, method = 'GET', body = null) {
+      const opts = { method, headers: { 'Content-Type': 'application/json' } }
+      if (body) opts.body = JSON.stringify(body)
+      const res = await fetch(API + path, opts)
+      if (res.status === 204) return null
+      return res.json()
+    }
+
+    function status(elId, msg, isErr = false) {
+      const el = document.getElementById(elId)
+      el.className = 'status ' + (isErr ? 'status-err' : 'status-ok')
+      el.textContent = msg
+      setTimeout(() => el.textContent = '', 3000)
+    }
+
+    async function loadProfiles() {
+      const profiles = await api('/api/profiles')
+      const list = document.getElementById('profiles-list')
+      if (!profiles?.length) { list.innerHTML = '<p class="empty">Aucun profil</p>'; return }
+      list.innerHTML = profiles.map(p => `
+        <div class="item">
+          <div class="item-info">
+            <div class="item-title">${p.name}</div>
+            <div class="item-sub">${p.email} ${p.age ? '· ' + p.age + ' ans' : ''}</div>
+            <div class="item-sub" style="font-size:0.65rem;color:#334155;margin-top:4px">${p.id}</div>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm" onclick="navigator.clipboard.writeText('${p.id}')">Copier ID</button>
+            <button class="btn btn-danger" onclick="deleteProfile('${p.id}')">✕</button>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    async function createProfile() {
+      const name = document.getElementById('p-name').value.trim()
+      const email = document.getElementById('p-email').value.trim()
+      const age = parseInt(document.getElementById('p-age').value) || null
+      if (!name || !email) return status('p-status', 'Nom et email requis', true)
+
+      const res = await api('/api/profiles', 'POST', { name, email, age })
+      if (res?.error) return status('p-status', res.error, true)
+      status('p-status', `Profil "${res.name}" créé !`)
+      document.getElementById('p-name').value = ''
+      document.getElementById('p-email').value = ''
+      document.getElementById('p-age').value = ''
+      loadProfiles()
+    }
+
+    async function deleteProfile(id) {
+      if (!confirm('Supprimer ce profil ?')) return
+      await api(`/api/profiles/${id}`, 'DELETE')
+      loadProfiles()
+      loadPosts()
+    }
+
+    async function loadPosts(all = false, tab = null) {
+      if (tab) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'))
+        tab.classList.add('active')
+      }
+      const posts = await api('/api/posts' + (all ? '?all=1' : ''))
+      const list = document.getElementById('posts-list')
+      if (!posts?.length) { list.innerHTML = '<p class="empty">Aucun article</p>'; return }
+      list.innerHTML = posts.map(p => `
+        <div class="item">
+          <div class="item-info">
+            <div class="item-title">${p.title} <span class="tag ${p.published ? 'tag-green' : 'tag-gray'}">${p.published ? 'publié' : 'brouillon'}</span></div>
+            <div class="item-sub">${p.profiles?.name || 'Auteur inconnu'} · ${new Date(p.created_at).toLocaleDateString('fr')}</div>
+            ${p.content ? `<div class="item-sub" style="margin-top:4px">${p.content.substring(0, 80)}${p.content.length > 80 ? '…' : ''}</div>` : ''}
+          </div>
+          <div class="item-actions">
+            ${!p.published ? `<button class="btn btn-sm" onclick="publishPost('${p.id}')">Publier</button>` : ''}
+            <button class="btn btn-danger" onclick="deletePost('${p.id}')">✕</button>
+          </div>
+        </div>
+      `).join('')
+    }
+
+    async function createPost() {
+      const title = document.getElementById('post-title').value.trim()
+      const content = document.getElementById('post-content').value.trim()
+      const author_id = document.getElementById('post-author').value.trim()
+      if (!title || !author_id) return status('post-status', 'Titre et auteur requis', true)
+
+      const res = await api('/api/posts', 'POST', { title, content, author_id, published: false })
+      if (res?.error) return status('post-status', res.error, true)
+      status('post-status', `Article "${res.title}" créé !`)
+      document.getElementById('post-title').value = ''
+      document.getElementById('post-content').value = ''
+      loadPosts(true, document.querySelector('.tab:not(.active)') ? null : document.querySelector('.tab'))
+    }
+
+    async function publishPost(id) {
+      await api(`/api/posts/${id}`, 'PUT', { published: true })
+      loadPosts(true)
+    }
+
+    async function deletePost(id) {
+      if (!confirm('Supprimer cet article ?')) return
+      await api(`/api/posts/${id}`, 'DELETE')
+      loadPosts()
+    }
+
+    // Init
+    loadProfiles()
+    loadPosts()
+  </script>
+</body>
+</html>
