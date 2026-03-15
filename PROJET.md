@@ -209,7 +209,73 @@ const { createClient } = await jest.unstable_mockModule('@supabase/supabase-js',
 
 ---
 
-## 10. Environnement de développement
+## 10. Interactions entre les acteurs du projet
+
+### Les 4 acteurs
+
+| Acteur | Rôle |
+|---|---|
+| **Toi (l'humain)** | Donnes les instructions, approuves les actions, récupères le code en local |
+| **Claude Code** | Agent IA qui lit, modifie et pousse le code — travaille à distance |
+| **GitHub** | Stockage permanent et central du code |
+| **Supabase** | Base de données / backend de l'application en production |
+
+---
+
+### Les 4 endroits où le code existe
+
+```
+1. Serveur Claude (cloud Anthropic)
+   └── copie de travail temporaire du repo
+       Claude lit, modifie, teste les fichiers ici
+            ↓ git push
+2. GitHub
+   └── stockage permanent du code
+       branche claude/...
+            ↓ git pull
+3. Ta machine locale (Windows)
+   └── ta copie personnelle
+       tu peux lire, modifier, tester
+            ↓ déploiement
+4. Supabase / Vercel / prod
+   └── l'app qui tourne pour les vrais utilisateurs
+```
+
+---
+
+### Le flux typique
+
+```
+Toi           →  "Fais X"
+Claude Code   →  modifie les fichiers, commit, push sur GitHub
+GitHub        →  stocke les changements sur la branche claude/...
+Toi           →  git pull → tu récupères le code sur ton PC
+Supabase      →  ton app se connecte à la DB en production
+```
+
+---
+
+### Point critique : le serveur Claude est éphémère
+
+Le serveur Claude est un **environnement de travail temporaire**. Une fois la session terminée, la copie locale de Claude disparaît. Tout ce qui n'a pas été `push` sur GitHub est **perdu**.
+
+```
+Serveur Claude  →  modifie fichiers
+                →  OUBLIE de push
+Session se termine
+                →  ❌ tout est perdu
+
+Serveur Claude  →  modifie fichiers
+                →  commit + push ✅
+GitHub          →  code sauvegardé
+Toi             →  git pull → code récupéré ✅
+```
+
+GitHub est le seul endroit **permanent**. C'est pourquoi le `push` est une étape critique à chaque session.
+
+---
+
+## 11. Environnement de développement
 
 | Élément | Version / Détail |
 |---|---|
