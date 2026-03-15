@@ -3,6 +3,8 @@
  * Tests avec mocks Supabase - aucune connexion réelle requise.
  */
 
+import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+
 const mockSingle = jest.fn()
 const mockEq = jest.fn(() => ({ single: mockSingle, select: jest.fn(() => ({ single: mockSingle })) }))
 const mockOrder = jest.fn(() => [])
