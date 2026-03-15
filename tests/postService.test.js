@@ -3,6 +3,8 @@
  * Tests avec mocks Supabase - aucune connexion réelle requise.
  */
 
+import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+
 const mockSingle = jest.fn()
 const mockEq = jest.fn(() => ({ single: mockSingle, select: jest.fn(() => ({ single: mockSingle })) }))
 const mockOrder = jest.fn(() => [])
@@ -14,7 +16,7 @@ const mockSelectQuery = jest.fn(() => ({
   single: mockSingle
 }))
 
-jest.mock('../src/db/supabase.js', () => ({
+await jest.unstable_mockModule('../src/db/supabase.js', () => ({
   default: {
     from: jest.fn(() => ({
       insert: jest.fn(() => ({ select: jest.fn(() => ({ single: mockSingle })) })),

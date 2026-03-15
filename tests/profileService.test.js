@@ -3,6 +3,8 @@
  * Ces tests utilisent des mocks pour simuler Supabase sans connexion réelle.
  */
 
+import { jest, describe, it, expect, beforeEach } from '@jest/globals'
+
 // Mock du module Supabase
 const mockSingle = jest.fn()
 const mockSelect = jest.fn(() => ({ single: mockSingle }))
@@ -16,7 +18,7 @@ const mockFrom = jest.fn(() => ({
   delete: jest.fn(() => ({ eq: jest.fn(() => ({ error: null })) })),
 }))
 
-jest.mock('../src/db/supabase.js', () => ({
+await jest.unstable_mockModule('../src/db/supabase.js', () => ({
   default: { from: mockFrom },
   supabase: { from: mockFrom }
 }))
