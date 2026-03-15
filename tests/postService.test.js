@@ -16,7 +16,7 @@ const mockSelectQuery = jest.fn(() => ({
   single: mockSingle
 }))
 
-jest.mock('../src/db/supabase.js', () => ({
+await jest.unstable_mockModule('../src/db/supabase.js', () => ({
   default: {
     from: jest.fn(() => ({
       insert: jest.fn(() => ({ select: jest.fn(() => ({ single: mockSingle })) })),
